@@ -9,27 +9,27 @@ source ENV['GEM_SOURCE'] || "https://rubygems.org"
 # -=-=-=-=-=- WARNING -=-=-=-=-=-
 
 group :development do
+  gem 'json', "< 2.8.0",                  :require => false
+  gem 'openfact', '>= 5.1', '< 6',        :require => false
+  gem 'openvox-strings', '~> 7.1',        :require => false
+  gem 'puppetfile-resolver', '~> 0.6.2',  :require => false
   gem 'rake', '>= 10.4',                  :require => false
   gem 'rspec', '>= 3.2',                  :require => false
-  gem 'puppet-lint', '~> 4.0',            :require => false
-  gem 'puppetfile-resolver', '~> 0.6.2',  :require => false
+  gem 'rubocop-capybara', '~> 2.22.0',    :require => false
+  gem 'rubocop-factory_bot', '~> 2.27.0', :require => false
+  gem 'rubocop-rspec_rails', '~> 2.31.0', :require => false
+  gem 'simplecov-console',                :require => false
+  gem 'simplecov',                        :require => false
+  gem 'voxpupuli-puppet-lint-plugins', '>= 6.0', '< 7.8', :require => false
   gem 'yard', '~> 0.9.28',                :require => false
-  gem 'openvox-strings', '~> 7.1',         :require => false
-  gem 'openfact', '>= 5.1', '< 6',         :require => false
-  gem "rubocop", '~> 1.73.0',             :require => false
   gem "rubocop-performance", '~> 1.24.0', :require => false
   gem "rubocop-rspec", '~> 3.5.0',        :require => false
-  gem 'rubocop-rspec_rails', '~> 2.31.0', :require => false
-  gem 'rubocop-factory_bot', '~> 2.27.0', :require => false
-  gem 'rubocop-capybara', '~> 2.22.0',    :require => false
-  gem 'simplecov',                        :require => false
-  gem 'simplecov-console',                :require => false
-  gem 'json', "< 2.8.0",                  :require => false
+  gem "rubocop", '~> 1.73.0',             :require => false
 
   if ENV['OPENVOX_GEM_VERSION']
     gem 'openvox', ENV['OPENVOX_GEM_VERSION'], :require => false
   else
-    gem 'openvox',                           :require => false
+    gem 'openvox', :require => false
   end
 
   case RUBY_PLATFORM
