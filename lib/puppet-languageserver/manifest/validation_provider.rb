@@ -54,12 +54,17 @@ module PuppetLanguageServer
                            LSP::DiagnosticSeverity::HINT
                          end
 
-              endpos = problem[:column] - 1
-              endpos = problem[:column] - 1 + problem[:token].to_manifest.length unless problem[:token].nil? || problem[:token].value.nil?
+              startpos = problem[:column] - 1
+              token_length = if problem[:token].nil? || problem[:token].value.nil?
+                               1
+                             else
+                               problem[:token].to_manifest.length
+                             end
+              endpos = startpos + [token_length, 1].max
 
               result << LSP::Diagnostic.new('severity' => severity,
                                             'code' => problem[:check].to_s,
-                                            'range' => LSP.create_range(problem[:line] - 1, problem[:column] - 1, problem[:line] - 1, endpos),
+                                            'range' => LSP.create_range(problem[:line] - 1, startpos, problem[:line] - 1, endpos),
                                             'source' => 'Puppet',
                                             'message' => problem[:message])
             end

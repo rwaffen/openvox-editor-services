@@ -118,6 +118,14 @@ describe 'PuppetLanguageServer::Manifest::ValidationProvider' do
 
         expect(diagnostics.map(&:code)).to include('parameter_documentation')
       end
+
+      it 'marks at least one character for diagnostics without a puppet-lint token' do
+        diagnostic = subject.validate(session_state, manifest).find do |item|
+          item.code == 'parameter_documentation'
+        end
+
+        expect(diagnostic.range.end.character).to be > diagnostic.range.start.character
+      end
     end
 
     describe "Given an incomplete manifest which has syntax errors" do
