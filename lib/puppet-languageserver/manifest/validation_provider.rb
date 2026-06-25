@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-require 'puppet-lint'
+require 'puppet-languageserver/puppet_lint'
 module PuppetLanguageServer
   module Manifest
     module ValidationProvider
+      LINT_FILENAME = 'manifest.pp'
+
       # Similar to 'validate' this will run puppet-lint and returns
       # the manifest with any fixes applied
       #
@@ -15,9 +17,7 @@ module PuppetLanguageServer
         init_puppet_lint(session_state.documents.store_root_path, ['--fix'])
 
         linter = PuppetLint::Checks.new
-        linter.load_data(nil, content)
-
-        problems = linter.run(nil, content)
+        problems = linter.run(LINT_FILENAME, content)
         problems_fixed = problems.nil? ? 0 : problems.count { |item| item[:kind] == :fixed }
 
         [problems_fixed, linter.manifest]
@@ -37,9 +37,7 @@ module PuppetLanguageServer
 
         begin
           linter = PuppetLint::Checks.new
-          linter.load_data(nil, content)
-
-          problems = linter.run(nil, content)
+          problems = linter.run(LINT_FILENAME, content)
           unless problems.nil?
             problems.each do |problem|
               # Syntax errors are better handled by the puppet parser, not puppet lint

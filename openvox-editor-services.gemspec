@@ -20,11 +20,11 @@ Gem::Specification.new do |s|
                               'bin/*',
                               '[A-Z]*'].to_a.reject { |file| file.end_with?('.gem') }
   s.license        = 'Apache-2.0'
-  s.add_runtime_dependency 'puppet-lint', '~> 4.0'
   s.add_runtime_dependency 'hiera-eyaml', '~> 2.1'
-  s.add_runtime_dependency 'puppetfile-resolver', '~> 0.6'
   s.add_runtime_dependency 'molinillo', '~> 0.6'
-  s.add_runtime_dependency 'openvox-strings', '~> 7.1'
   s.add_runtime_dependency 'openfact', '>= 5.1', '< 6'
+  s.add_runtime_dependency 'openvox-strings', '~> 7.1'
+  s.add_runtime_dependency 'puppetfile-resolver', '~> 0.6'
+  s.add_runtime_dependency 'voxpupuli-puppet-lint-plugins', '= 7.0.0'
   s.add_runtime_dependency 'yard', '~> 0.9'
 end

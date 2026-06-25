@@ -60,13 +60,10 @@ end
 desc "Download and vendor required gems"
 task :gem_revendor do
   require 'fileutils'
+  require 'rubygems/package'
+  require 'tmpdir'
 
   gem_list = [
-    {
-      :directory => 'puppet-lint',
-      :github_repo => 'https://github.com/puppetlabs/puppet-lint.git',
-      :github_ref => 'v4.2.4',
-    },
     {
       :directory => 'hiera-eyaml',
       :github_repo => 'https://github.com/voxpupuli/hiera-eyaml',
@@ -99,12 +96,43 @@ task :gem_revendor do
     },
   ]
 
+  # voxpupuli-puppet-lint-plugins 7.0.0 is a metadata-only gem. Its complete runtime
+  # dependency set must be vendored explicitly because the packaged language
+  # server runs without Bundler or access to installed gems.
+  puppet_lint_gems = {
+    'puppet-lint' => '5.1.1',
+    'puppet-lint-absolute_classname-check' => '5.0.0',
+    'puppet-lint-anchor-check' => '3.0.0',
+    'puppet-lint-exec_idempotency-check' => '2.0.0',
+    'puppet-lint-file_ensure-check' => '3.0.0',
+    'puppet-lint-leading_zero-check' => '3.0.0',
+    'puppet-lint-lookup_in_parameter-check' => '3.0.0',
+    'puppet-lint-manifest_whitespace-check' => '2.0.0',
+    'puppet-lint-optional_default-check' => '3.0.0',
+    'puppet-lint-package_ensure-check' => '0.2.0',
+    'puppet-lint-param-docs' => '3.0.0',
+    'puppet-lint-param-types' => '3.0.0',
+    'puppet-lint-params_empty_string-check' => '3.0.0',
+    'puppet-lint-params_not_optional_with_undef-check' => '1.0.0',
+    'puppet-lint-resource_reference_syntax' => '3.0.0',
+    'puppet-lint-strict_indent-check' => '5.0.0',
+    'puppet-lint-topscope-variable-check' => '3.0.0',
+    'puppet-lint-trailing_comma-check' => '3.0.1',
+    'puppet-lint-unquoted_string-check' => '4.1.0',
+    'puppet-lint-variable_contains_upcase' => '3.0.0',
+    'puppet-lint-version_comparison-check' => '3.0.0',
+  }
+
   # Clean out the vendor directory first
   puts "Clearing the vendor directory..."
   vendor_dir = File.join(File.dirname(__FILE__),'vendor')
   FileUtils.rm_rf(File.join(vendor_dir, 'puppet-strings'))
   gem_list.each do |vendor|
     gem_dir = File.join(vendor_dir,vendor[:directory])
+    FileUtils.rm_rf(gem_dir) if Dir.exist?(gem_dir)
+  end
+  puppet_lint_gems.each_key do |gem_name|
+    gem_dir = File.join(vendor_dir, gem_name)
     FileUtils.rm_rf(gem_dir) if Dir.exist?(gem_dir)
   end
   Dir.mkdir(vendor_dir) unless Dir.exist?(vendor_dir)
@@ -126,6 +154,26 @@ task :gem_revendor do
     FileUtils.rm_rf(File.join(gem_dir,'docs'))
   end
 
+  Dir.mktmpdir('openvox-editor-services-gems') do |download_dir|
+    puppet_lint_gems.each do |gem_name, gem_version|
+      puts "Vendoring #{gem_name} #{gem_version}..."
+      gem_filename = "#{gem_name}-#{gem_version}.gem"
+
+      Dir.chdir(download_dir) do
+        sh Gem.ruby, '-S', 'gem', 'fetch', gem_name,
+           '--version', gem_version,
+           '--clear-sources',
+           '--source', 'https://rubygems.org'
+      end
+
+      gem_dir = File.join(vendor_dir, gem_name)
+      Gem::Package.new(File.join(download_dir, gem_filename)).extract_files(gem_dir)
+      FileUtils.rm_rf(File.join(gem_dir, 'spec'))
+      FileUtils.rm_rf(File.join(gem_dir, 'features'))
+      FileUtils.rm_rf(File.join(gem_dir, 'docs'))
+    end
+  end
+
   # Generate the README
   readme = <<-HEREDOC
 # Vendored Gems
@@ -141,9 +189,11 @@ Note - To improve the packaging size, test files etc. were stripped from the Gem
 Gem List
 --------
 
+* voxpupuli-puppet-lint-plugins (metadata dependency version 7.0.0)
 HEREDOC
   gem_list.each { |vendor| readme += "* #{vendor[:directory]} (#{vendor[:github_repo]} ref #{vendor[:github_ref]})\n"}
-  File.open(File.join(vendor_dir,'README.md'), 'wb') { |file| file.write(readme + "\n") }
+  puppet_lint_gems.each { |gem_name, gem_version| readme += "* #{gem_name} (RubyGems version #{gem_version})\n" }
+  File.open(File.join(vendor_dir,'README.md'), 'wb') { |file| file.write(readme) }
 end
 
 desc "Create compressed files of the language and debug servers for release"

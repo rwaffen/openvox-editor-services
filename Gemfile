@@ -20,7 +20,7 @@ group :development do
   gem 'rubocop-rspec_rails', '~> 2.31.0', :require => false
   gem 'simplecov-console',                :require => false
   gem 'simplecov',                        :require => false
-  gem 'voxpupuli-puppet-lint-plugins', '>= 6.0', '< 7.8', :require => false
+  gem 'voxpupuli-puppet-lint-plugins', '= 7.0.0', :require => false
   gem 'yard', '~> 0.9.28',                :require => false
   gem "rubocop-performance", '~> 1.24.0', :require => false
   gem "rubocop-rspec", '~> 3.5.0',        :require => false

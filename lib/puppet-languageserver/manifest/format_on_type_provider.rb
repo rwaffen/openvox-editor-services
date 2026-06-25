@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'puppet-lint'
+require 'puppet-languageserver/puppet_lint'
 
 module PuppetLanguageServer
   module Manifest

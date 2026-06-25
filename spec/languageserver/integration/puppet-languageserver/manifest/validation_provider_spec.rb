@@ -101,6 +101,25 @@ describe 'PuppetLanguageServer::Manifest::ValidationProvider' do
   end
 
   describe '#validate' do
+    describe 'with vendored Vox Pupuli puppet-lint plugins' do
+      let(:manifest) do
+        <<~PUPPET
+          # @summary Example class
+          class example(
+            String $documented = 'value',
+            String $undocumented = 'value',
+          ) {
+          }
+        PUPPET
+      end
+
+      it 'returns diagnostics from the plugin checks' do
+        diagnostics = subject.validate(session_state, manifest)
+
+        expect(diagnostics.map(&:code)).to include('parameter_documentation')
+      end
+    end
+
     describe "Given an incomplete manifest which has syntax errors" do
       let(:manifest) { 'user { "Bob"' }
 
