@@ -35,13 +35,13 @@ module PuppetLanguageServer
         SingleInstanceQueueJob
       end
 
-      def new_job(*args)
-        job_class.new(*args)
+      def new_job(*)
+        job_class.new(*)
       end
 
       # Helpful method to create, then enqueue a job
-      def enqueue(*args)
-        enqueue_job(new_job(*args))
+      def enqueue(*)
+        enqueue_job(new_job(*))
       end
 
       # Enqueue a job
@@ -70,8 +70,8 @@ module PuppetLanguageServer
       end
 
       # Helpful method to create, then enqueue a job
-      def execute(*args)
-        execute_job(new_job(*args))
+      def execute(*)
+        execute_job(new_job(*))
       end
 
       # Synchronously executes the same work as an enqueued item. Does not consume a queue thread

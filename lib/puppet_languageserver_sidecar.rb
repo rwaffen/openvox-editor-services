@@ -42,7 +42,9 @@ module PuppetLanguageServerSidecar
     $VERBOSE = nil
 
     # Use a specific OpenVox Gem version if requested.
-    unless options[:puppet_version].nil?
+    if options[:puppet_version].nil?
+      OpenVoxRuntime.activate!
+    else
       available_openvox_gems = OpenVoxRuntime.available_versions
       if available_openvox_gems.include?(options[:puppet_version])
         OpenVoxRuntime.activate!(options[:puppet_version])
@@ -50,8 +52,6 @@ module PuppetLanguageServerSidecar
         log_message(:warn, "Unable to use OpenVox version #{options[:puppet_version]}, as only the following versions are available [#{available_openvox_gems.join(', ')}]")
         OpenVoxRuntime.activate!
       end
-    else
-      OpenVoxRuntime.activate!
     end
     OpenFactRuntime.activate!
 
