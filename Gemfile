@@ -49,12 +49,7 @@ group :development do
   gem "minitar"    , :require => false
 end
 
-# Evaluate Gemfile.local if it exists
-if File.exist? "#{__FILE__}.local"
-  eval(File.read("#{__FILE__}.local"), binding)
-end
-
-# Evaluate ~/.gemfile if it exists
-if File.exist?(File.join(Dir.home, '.gemfile'))
-  eval(File.read(File.join(Dir.home, '.gemfile')), binding)
+group :release, optional: true do
+  gem 'faraday-retry', '~> 2.1', require: false
+  gem 'github_changelog_generator', '~> 1.18', require: false
 end
